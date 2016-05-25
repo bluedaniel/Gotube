@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/bluedaniel/tube/command"
-	"github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 )
 
 var GlobalFlags = []cli.Flag{}
