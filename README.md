@@ -11,7 +11,7 @@
 To install, use `go get`:
 
 ```bash
-$ go get -d github.com/bluedaniel/tube
+$ go get -d github.com/bluedaniel/gotube
 ```
 
 ## Contribution

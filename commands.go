@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/bluedaniel/tube/command"
+	"github.com/bluedaniel/gotube/command"
 	"github.com/urfave/cli"
 )
 
