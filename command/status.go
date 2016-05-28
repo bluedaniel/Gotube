@@ -5,51 +5,70 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"regexp"
+	"strings"
 
 	"github.com/fatih/color"
 	"github.com/kyokomi/emoji"
 	"github.com/urfave/cli"
 )
 
-// Tube contains ftl data
-type Tube struct {
-	Name, ModeName string
+// LineStatuses contains line data
+type status struct {
+	StatusSeverity            int
+	StatusSeverityDescription string
+	Reason                    string
 }
 
-func getJSON(url string) []byte {
+// Tube contains ftl data
+type Tube struct {
+	Name         string
+	LineStatuses []status
+}
+
+func getJSON(url string) string {
 	r, err := http.Get(url)
 	if err != nil {
 		panic(err.Error())
 	}
 	defer r.Body.Close()
 	rb, err := ioutil.ReadAll(r.Body)
-	return rb
+	return string(rb[:])
+}
+
+func pickEmoji(v int) string {
+	switch v {
+	case 10:
+		return ":thumbsup:"
+	case 9:
+		return ":ok_hand:"
+	}
+	return ":shit:"
+}
+
+func serviceStatus(tube Tube) int {
+	return tube.LineStatuses[0].StatusSeverity
 }
 
 // CmdStatus runs `tube status`
 func CmdStatus(c *cli.Context) error {
-	jsonByte := getJSON("https://api.tfl.gov.uk/Line/Mode/tube")
+	s := getJSON("https://api.tfl.gov.uk/line/mode/tube/status")
+	tubeTextFormat := color.New(color.FgWhite).Add(color.Bold).SprintFunc()
 
 	var arr []Tube
-	json.Unmarshal(jsonByte, &arr)
-
-	colors := map[string]color.Attribute{
-		"Bakerloo":           color.FgHiBlack,
-		"Central":            color.FgRed,
-		"Circle":             color.FgHiYellow,
-		"District":           color.FgGreen,
-		"Hammersmith & City": color.FgHiYellow,
-		"Jubilee":            color.FgHiCyan,
-		"Metropolitan":       color.FgHiYellow,
-		"Northern":           color.FgWhite,
-		"Piccadilly":         color.FgHiBlue,
-		"Victoria":           color.FgBlue,
-		"Waterloo & City":    color.FgHiCyan,
-	}
+	json.Unmarshal([]byte(s), &arr)
 
 	for _, e := range arr {
-		colFn := color.New(colors[e.Name]).Add(color.Bold).SprintFunc()
-		fmt.Printf("%s %s (%s)\n", emoji.Sprint(":rage:"), colFn(e.Name), e.ModeName)
+		fmt.Printf("%s %s\n", emoji.Sprint(pickEmoji(serviceStatus(e))),
+			tubeTextFormat(e.Name))
+
+		if serviceStatus(e) < 10 {
+			re := regexp.MustCompile("(?i)" + regexp.QuoteMeta(e.Name) + " line:")
+			for _, statuses := range e.LineStatuses {
+				fmt.Printf("  %s %s\n", emoji.Sprint(":exclamation:"),
+					strings.Trim(re.ReplaceAllString(statuses.Reason, ""), " "))
+			}
+		}
 	}
 	return nil
 }
