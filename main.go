@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 
+	"github.com/bluedaniel/gotube/command"
 	"github.com/urfave/cli"
 )
 
@@ -17,6 +18,10 @@ func main() {
 	app.Flags = GlobalFlags
 	app.Commands = Commands
 	app.CommandNotFound = CommandNotFound
+
+	if len(os.Args) == 1 {
+		app.Action = command.CmdStatus
+	}
 
 	app.Run(os.Args)
 }
