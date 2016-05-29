@@ -13,17 +13,14 @@ import (
 	"github.com/urfave/cli"
 )
 
-// LineStatuses contains line data
-type status struct {
-	StatusSeverity            int
-	StatusSeverityDescription string
-	Reason                    string
-}
-
 // Tube contains ftl data
 type Tube struct {
 	Name         string
-	LineStatuses []status
+	LineStatuses []struct {
+		StatusSeverity            int
+		StatusSeverityDescription string
+		Reason                    string
+	}
 }
 
 func serviceStatus(tube Tube) int { return tube.LineStatuses[0].StatusSeverity }
