@@ -9,7 +9,6 @@ import (
 
 	"github.com/bluedaniel/gotube/utils"
 	"github.com/fatih/color"
-	"github.com/kyokomi/emoji"
 	"github.com/urfave/cli"
 )
 
@@ -34,13 +33,13 @@ func formatTubeReason(name, reason string) string {
 func pickEmoji(v int) string {
 	switch v {
 	case 20:
-		return ":no_entry_sign:"
+		return color.RedString("✖")
 	case 10:
-		return ":thumbsup:"
+		return color.GreenString("✔")
 	case 9:
-		return ":ok_hand:"
+		return color.YellowString("⚠")
 	}
-	return ":shit:"
+	return color.RedString("✖")
 }
 
 type byStatus []Tube
@@ -64,12 +63,12 @@ func CmdStatus(c *cli.Context) error {
 		if i > 0 && serviceStatus(arr[i-1]) != serviceStatus(e) {
 			fmt.Println("----------------------------")
 		}
-		fmt.Printf("%s %s\n", emoji.Sprint(pickEmoji(serviceStatus(e))),
+		fmt.Printf("%s %s\n", (pickEmoji(serviceStatus(e))),
 			tubeTextFormat(e.Name))
 
 		if serviceStatus(e) != 10 {
 			for _, statuses := range e.LineStatuses {
-				fmt.Printf("  %s %s\n", emoji.Sprint(":exclamation:"),
+				fmt.Printf("  %s %s\n", color.BlueString("ℹ"),
 					formatTubeReason(e.Name, statuses.Reason))
 			}
 		}
