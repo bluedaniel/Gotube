@@ -21,6 +21,8 @@ func main() {
 
 	if len(os.Args) == 1 {
 		app.Action = command.CmdStatus
+	} else {
+		app.Action = command.CmdStation
 	}
 
 	app.Run(os.Args)
