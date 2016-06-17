@@ -15,3 +15,19 @@ func GetJSON(url string) string {
 	rb, err := ioutil.ReadAll(r.Body)
 	return string(rb[:])
 }
+
+func GetTubeNames() [11]string {
+	return [11]string{
+		"bakerloo",
+		"central",
+		"circle",
+		"district",
+		"hammersmith-city",
+		"jubilee",
+		"metropolitan",
+		"northern",
+		"piccadilly",
+		"victoria",
+		"waterloo-city",
+	}
+}

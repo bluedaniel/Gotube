@@ -46,7 +46,7 @@ func CmdStation(c *cli.Context) error {
 	var arr2 StopPointDataResp
 	json.Unmarshal([]byte(stopPointData), &arr2)
 
-	fmt.Println(arr2)
+	fmt.Println(utils.GetTubeNames())
 	//
 	// fmt.Println("https://api.tfl.gov.uk/StopPoint/Search/" + query.String() + "?modes=tube")
 	// fmt.Println(arr.Matches[0])
