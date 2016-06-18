@@ -5,8 +5,8 @@ import (
 	"net/http"
 )
 
-// GetJSON is a fetch helper
-func GetJSON(url string) string {
+// Fetch is a fetch helper
+func Fetch(url string) string {
 	r, err := http.Get(url)
 	if err != nil {
 		panic(err.Error())

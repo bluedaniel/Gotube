@@ -16,7 +16,7 @@ func CmdStation(c *cli.Context) error {
 	q := strings.Join(c.Args()[:], " ")
 	query := &url.URL{Path: strings.Replace(q, "and", "&", -1)}
 
-	stopPointSearch := utils.GetJSON(utils.StopPointSearchURL(query.String()))
+	stopPointSearch := utils.Fetch(utils.StopPointSearchURL(query.String()))
 	var arr1 utils.StopPointSearchResp
 	json.Unmarshal([]byte(stopPointSearch), &arr1)
 
@@ -25,7 +25,7 @@ func CmdStation(c *cli.Context) error {
 		os.Exit(2)
 	}
 
-	stopPointData := utils.GetJSON(utils.StopPointURL(arr1.Matches[0].ID))
+	stopPointData := utils.Fetch(utils.StopPointURL(arr1.Matches[0].ID))
 	var arr2 utils.StopPointDataResp
 	json.Unmarshal([]byte(stopPointData), &arr2)
 
@@ -38,13 +38,13 @@ func CmdStation(c *cli.Context) error {
 
 	for i, line := range tubesAtStation {
 		if i == 0 {
-			first := utils.GetJSON(utils.StopPointDeadline(arr1.Matches[0].ID, line, true))
+			first := utils.Fetch(utils.StopPointDeadline(arr1.Matches[0].ID, line, true))
 			fmt.Println(first)
 		}
 	}
 
-	// first := utils.GetJSON("https://tfl.gov.uk/Timetables/FirstLastServicesSummaryAjax?fromId=940GZZLUHAI&lines=victoria&firstNextDay=true")
-	// last := utils.GetJSON("https://tfl.gov.uk/Timetables/FirstLastServicesSummaryAjax?fromId=940GZZLUHAI&lines=victoria&firstNextDay=false")
+	// first := utils.Fetch("https://tfl.gov.uk/Timetables/FirstLastServicesSummaryAjax?fromId=940GZZLUHAI&lines=victoria&firstNextDay=true")
+	// last := utils.Fetch("https://tfl.gov.uk/Timetables/FirstLastServicesSummaryAjax?fromId=940GZZLUHAI&lines=victoria&firstNextDay=false")
 
 	// fmt.Printf(url.QueryEscape("https://api.tfl.gov.uk/StopPoint/Search/" + q + "?modes=tube"))
 	return nil

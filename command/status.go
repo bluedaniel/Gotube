@@ -42,7 +42,7 @@ func (a byStatus) Less(i, j int) bool {
 
 // CmdStatus runs `tube status`
 func CmdStatus(c *cli.Context) error {
-	s := utils.GetJSON(utils.TubeStatus())
+	s := utils.Fetch(utils.TubeStatus())
 	tubeTextFormat := color.New(color.FgWhite).Add(color.Bold).SprintFunc()
 
 	var arr []utils.Tube
