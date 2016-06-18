@@ -42,9 +42,9 @@ func (a byStatus) Less(i, j int) bool {
 
 // CmdStatus runs `tube status`
 func CmdStatus(c *cli.Context) error {
-	s := utils.Fetch(utils.TubeStatus())
 	tubeTextFormat := color.New(color.FgWhite).Add(color.Bold).SprintFunc()
 
+	s := utils.FetchJSON(utils.TubeStatus())
 	var arr []utils.Tube
 	json.Unmarshal([]byte(s), &arr)
 	sort.Sort(byStatus(arr))
