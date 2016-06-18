@@ -16,8 +16,19 @@ func GetJSON(url string) string {
 	return string(rb[:])
 }
 
-func GetTubeNames() [11]string {
-	return [11]string{
+// StringInSlice checks if `x in arr`
+func StringInSlice(a string, list []string) bool {
+	for _, b := range list {
+		if b == a {
+			return true
+		}
+	}
+	return false
+}
+
+// GetTubeNames is a static list of available tube lines
+func GetTubeNames() []string {
+	return []string{
 		"bakerloo",
 		"central",
 		"circle",

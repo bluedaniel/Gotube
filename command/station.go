@@ -11,30 +11,13 @@ import (
 	"github.com/urfave/cli"
 )
 
-// StopPointSearchResp contains stopPoint data
-type StopPointSearchResp struct {
-	Total   int
-	Matches []struct {
-		IcsID string
-		Name  string
-		ID    string
-	}
-}
-
-// StopPointDataResp gets the station ID
-type StopPointDataResp struct {
-	Lines []struct {
-		ID string
-	}
-}
-
 // CmdStation runs `tube status`
 func CmdStation(c *cli.Context) error {
 	q := strings.Join(c.Args()[:], " ")
 	query := &url.URL{Path: strings.Replace(q, "and", "&", -1)}
 
-	stopPointSearch := utils.GetJSON("https://api.tfl.gov.uk/StopPoint/Search/" + query.String() + "?modes=tube")
-	var arr1 StopPointSearchResp
+	stopPointSearch := utils.GetJSON(utils.StopPointSearchURL(query.String()))
+	var arr1 utils.StopPointSearchResp
 	json.Unmarshal([]byte(stopPointSearch), &arr1)
 
 	if arr1.Total == 0 {
@@ -42,14 +25,23 @@ func CmdStation(c *cli.Context) error {
 		os.Exit(2)
 	}
 
-	stopPointData := utils.GetJSON("https://api.tfl.gov.uk/StopPoint/" + arr1.Matches[0].ID)
-	var arr2 StopPointDataResp
+	stopPointData := utils.GetJSON(utils.StopPointURL(arr1.Matches[0].ID))
+	var arr2 utils.StopPointDataResp
 	json.Unmarshal([]byte(stopPointData), &arr2)
 
-	fmt.Println(utils.GetTubeNames())
-	//
-	// fmt.Println("https://api.tfl.gov.uk/StopPoint/Search/" + query.String() + "?modes=tube")
-	// fmt.Println(arr.Matches[0])
+	tubesAtStation := []string{}
+	for _, line := range arr2.Lines {
+		if utils.StringInSlice(line.ID, utils.GetTubeNames()) {
+			tubesAtStation = append(tubesAtStation, line.ID)
+		}
+	}
+
+	for i, line := range tubesAtStation {
+		if i == 0 {
+			first := utils.GetJSON(utils.StopPointDeadline(arr1.Matches[0].ID, line, true))
+			fmt.Println(first)
+		}
+	}
 
 	// first := utils.GetJSON("https://tfl.gov.uk/Timetables/FirstLastServicesSummaryAjax?fromId=940GZZLUHAI&lines=victoria&firstNextDay=true")
 	// last := utils.GetJSON("https://tfl.gov.uk/Timetables/FirstLastServicesSummaryAjax?fromId=940GZZLUHAI&lines=victoria&firstNextDay=false")

@@ -12,17 +12,7 @@ import (
 	"github.com/urfave/cli"
 )
 
-// Tube contains ftl data
-type Tube struct {
-	Name         string
-	LineStatuses []struct {
-		StatusSeverity            int
-		StatusSeverityDescription string
-		Reason                    string
-	}
-}
-
-func serviceStatus(tube Tube) int { return tube.LineStatuses[0].StatusSeverity }
+func serviceStatus(tube utils.Tube) int { return tube.LineStatuses[0].StatusSeverity }
 
 func formatTubeReason(name, reason string) string {
 	name = strings.Replace(name, "&", "and", -1)
@@ -42,7 +32,7 @@ func pickEmoji(v int) string {
 	return color.RedString("✖")
 }
 
-type byStatus []Tube
+type byStatus []utils.Tube
 
 func (a byStatus) Len() int      { return len(a) }
 func (a byStatus) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
@@ -52,10 +42,10 @@ func (a byStatus) Less(i, j int) bool {
 
 // CmdStatus runs `tube status`
 func CmdStatus(c *cli.Context) error {
-	s := utils.GetJSON("https://api.tfl.gov.uk/line/mode/tube/status")
+	s := utils.GetJSON(utils.TubeStatus())
 	tubeTextFormat := color.New(color.FgWhite).Add(color.Bold).SprintFunc()
 
-	var arr []Tube
+	var arr []utils.Tube
 	json.Unmarshal([]byte(s), &arr)
 	sort.Sort(byStatus(arr))
 
