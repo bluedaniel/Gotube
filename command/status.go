@@ -42,7 +42,7 @@ func (a byStatus) Less(i, j int) bool {
 
 // CmdStatus runs `tube status`
 func CmdStatus(c *cli.Context) error {
-
+	fmt.Println()
 	s := utils.FetchJSON(utils.TubeStatus())
 	var arr []utils.Tube
 	json.Unmarshal([]byte(s), &arr)

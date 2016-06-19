@@ -46,7 +46,7 @@ func CmdStation(c *cli.Context) error {
 	messages := make(chan string)
 
 	fmt.Printf("\n%s %s", "Last trains from", utils.BoldFormat(arr1.Matches[0].Name))
-	fmt.Printf("\n%s\n", utils.BoldFormat(strings.Repeat("-", utf8.RuneCountInString(arr1.Matches[0].Name)+17)))
+	fmt.Printf("\n%s\n", utils.BoldFormat(strings.Repeat("=", utf8.RuneCountInString(arr1.Matches[0].Name)+17)))
 
 	for i, line := range tubesAtStation {
 		go func(last bool, stationID string, line string) {
