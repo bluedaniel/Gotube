@@ -42,7 +42,6 @@ func (a byStatus) Less(i, j int) bool {
 
 // CmdStatus runs `tube status`
 func CmdStatus(c *cli.Context) error {
-	tubeTextFormat := color.New(color.FgWhite).Add(color.Bold).SprintFunc()
 
 	s := utils.FetchJSON(utils.TubeStatus())
 	var arr []utils.Tube
@@ -51,14 +50,14 @@ func CmdStatus(c *cli.Context) error {
 
 	for i, e := range arr {
 		if i > 0 && serviceStatus(arr[i-1]) != serviceStatus(e) {
-			fmt.Println("----------------------------")
+			fmt.Println("============================")
 		}
 		fmt.Printf("%s %s\n", (pickEmoji(serviceStatus(e))),
-			tubeTextFormat(e.Name))
+			utils.BoldFormat(e.Name))
 
 		if serviceStatus(e) != 10 {
 			for _, statuses := range e.LineStatuses {
-				fmt.Printf("  %s %s\n", color.BlueString("ℹ"),
+				fmt.Printf("  %s %s\n", color.BlueString("🚧 "),
 					formatTubeReason(e.Name, statuses.Reason))
 			}
 		}

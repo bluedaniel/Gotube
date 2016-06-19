@@ -30,7 +30,9 @@ func CmdStation(c *cli.Context) error {
 		os.Exit(2)
 	}
 
-	stopPointData := utils.FetchJSON(utils.StopPointURL(arr1.Matches[0].ID))
+	stationID := arr1.Matches[0].ID
+
+	stopPointData := utils.FetchJSON(utils.StopPointURL(stationID))
 	var arr2 utils.StopPointDataResp
 	json.Unmarshal([]byte(stopPointData), &arr2)
 
@@ -41,25 +43,28 @@ func CmdStation(c *cli.Context) error {
 		}
 	}
 
-	matcher := func(n *html.Node) bool {
-		return scrape.Attr(n, "class") == "first-last-train-item"
-	}
+	messages := make(chan string)
 
-	boldFormat := color.New(color.FgWhite).Add(color.Bold).SprintFunc()
+	fmt.Printf("\n%s %s", "Last trains from", utils.BoldFormat(arr1.Matches[0].Name))
+	fmt.Printf("\n%s\n", utils.BoldFormat(strings.Repeat("-", utf8.RuneCountInString(arr1.Matches[0].Name)+17)))
 
-	stationLength := utf8.RuneCountInString(arr1.Matches[0].Name)
-	fmt.Printf("%s", boldFormat(strings.Repeat("=", stationLength+23)))
-	fmt.Printf("\n%s %s %s", "| Last trains from ", boldFormat(arr1.Matches[0].Name), " |")
-	fmt.Printf("\n%s\n", boldFormat(strings.Repeat("=", stationLength+23)))
+	for i, line := range tubesAtStation {
+		go func(last bool, stationID string, line string) {
+			firstHTML := utils.FetchHTML(utils.StopPointDeadline(stationID, line, false))
+			articles := scrape.FindAll(firstHTML, func(n *html.Node) bool {
+				return scrape.Attr(n, "class") == "first-last-train-item"
+			})
+			fmt.Printf("%s\n", utils.BoldFormat(strings.Title(strings.Replace(line, "-", " & ", -1))))
+			for _, article := range articles {
+				fmt.Println(color.GreenString("➡ ") + scrape.Text(article))
+			}
+			if !last {
+				fmt.Println()
+			}
+			messages <- ""
+		}(i+1 == len(tubesAtStation), stationID, line)
 
-	for _, line := range tubesAtStation {
-		firstHTML := utils.FetchHTML(utils.StopPointDeadline(arr1.Matches[0].ID, line, false))
-		articles := scrape.FindAll(firstHTML, matcher)
-		fmt.Printf("%s\n", boldFormat(" "+line))
-		for _, article := range articles {
-			fmt.Println("  ➡ " + scrape.Text(article))
-		}
-		fmt.Println(" ")
+		<-messages
 	}
 	return nil
 }

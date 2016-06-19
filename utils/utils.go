@@ -4,12 +4,13 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/fatih/color"
+
 	"golang.org/x/net/html"
 )
 
-// Fetch is a fetch helper
+// Fetch is a http.Get helper
 func Fetch(url string) *http.Response {
-	// fmt.Println(url)
 	r, err := http.Get(url)
 	if err != nil {
 		panic(err.Error())
@@ -59,3 +60,6 @@ func GetTubeNames() []string {
 		"waterloo-city",
 	}
 }
+
+// BoldFormat prints text in white/bold font
+var BoldFormat = color.New(color.FgWhite).Add(color.Bold).SprintFunc()
