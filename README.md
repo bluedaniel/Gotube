@@ -1,6 +1,6 @@
 ## GoTube
 
-> A terminal app for checking TFL tube status and last trains, written in Go
+> :metro: A terminal app for checking TFL tube status and last trains, written in Go
 
 ```console
 // Show the status of all tube lines
