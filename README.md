@@ -32,3 +32,11 @@ To build a compressed executable, install upx -  `brew install upx`
 $ go build -ldflags "-s -w"
 $ upx ./gotube
 ```
+
+
+- - -
+
+> Note: The terminal in the screenshot is made up of:
+- Shell: [ZSH - BobbyRussel theme](https://github.com/robbyrussell/oh-my-zsh)
+- Color scheme: [Dracula](https://draculatheme.com/iterm)
+- Font: [Source Code Pro](https://github.com/adobe-fonts/source-code-pro)
