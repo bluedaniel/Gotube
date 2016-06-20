@@ -23,3 +23,12 @@ To install, use `go get`:
 ```console
 $ go get -d github.com/bluedaniel/gotube
 ```
+
+### Build
+
+To build a compressed executable, install upx -  `brew install upx`
+
+```console
+$ go build -ldflags "-s -w"
+$ upx ./gotube
+```
