@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	"sync"
 	"unicode/utf8"
 
 	"golang.org/x/net/html"
@@ -43,28 +44,29 @@ func CmdStation(c *cli.Context) error {
 		}
 	}
 
-	messages := make(chan string)
-
 	fmt.Printf("\n%s %s", "Last trains from", utils.BoldFormat(arr1.Matches[0].Name))
 	fmt.Printf("\n%s\n", utils.BoldFormat(strings.Repeat("=", utf8.RuneCountInString(arr1.Matches[0].Name)+17)))
 
-	for i, line := range tubesAtStation {
-		go func(last bool, stationID string, line string) {
-			firstHTML := utils.FetchHTML(utils.StopPointDeadline(stationID, line, false))
-			articles := scrape.FindAll(firstHTML, func(n *html.Node) bool {
-				return scrape.Attr(n, "class") == "first-last-train-item"
-			})
-			fmt.Printf("%s\n", utils.BoldFormat(strings.Title(strings.Replace(line, "-", " & ", -1))))
-			for _, article := range articles {
-				fmt.Println(color.GreenString("➡ ") + scrape.Text(article))
-			}
-			if !last {
-				fmt.Println()
-			}
-			messages <- ""
-		}(i+1 == len(tubesAtStation), stationID, line)
+	var lines = map[string]*html.Node{}
 
-		<-messages
+	var wg sync.WaitGroup
+	for _, line := range tubesAtStation {
+		wg.Add(1)
+		go func(stationID string, line string) {
+			defer wg.Done()
+			lines[line] = utils.FetchHTML(utils.StopPointDeadline(stationID, line, false))
+		}(stationID, line)
+	}
+	wg.Wait()
+
+	for key, value := range lines {
+		articles := scrape.FindAll(value, func(n *html.Node) bool {
+			return scrape.Attr(n, "class") == "first-last-train-item"
+		})
+		fmt.Printf("%s\n", utils.BoldFormat(strings.Title(strings.Replace(key, "-", " & ", -1))))
+		for _, article := range articles {
+			fmt.Println(color.GreenString("➡ ") + scrape.Text(article))
+		}
 	}
 	return nil
 }
